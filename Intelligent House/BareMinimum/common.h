@@ -27,6 +27,7 @@
 #define LED_RED 3
 #define LED_GREEN 4
 #define LED_BLUE 5
+#define LED_POLICE 6
 #define REED_SWITCH 10
 #define SERVO_WINDOW 11
 #define SERVO_GARAGE 12
@@ -70,6 +71,7 @@ long delayAlarm = 0;										// Placeholder for timer1
 long delayClimate = 0;										// Placeholder for timer2
 long delayEntry = 0;										// Placeholder for timer3
 long delayOLED = 0;											// Placeholder for timer4
+long currentTime;											// Current time
 
 bool locked;												// Is the door locked?
 bool AlarmOn;												// Is the system armed?
@@ -92,15 +94,15 @@ void PrintOLED(int x, int y, String text);					// Prints text on the OLED at pix
 void SerialLog(String logEvent, String device);				// Writes important events through the serial port (115200 baud)
 
 // Loop functions
-void Alarm();												// Controls if the alarm system is active
-void Climate();												// Monitors the in-house climate
-void Entry();												// Checks the entry point if alarm is active
+void Alarm(int interval);									// Controls if the alarm system is active
+void Climate(int interval);									// Monitors the in-house climate
+void Entry(int interval);									// Checks the entry point if alarm is active
 void KeyIn();												// Controls the keypad input device
-void UpdateOLED();											// Loops around and clears the OLED and updates timestamp
+void UpdateOLED(int interval);								// Loops around and clears the OLED and updates timestamp
 
 // Nested functions
-void Sensor_PIR();											// Checks for motion when alarm is active
-void Sensor_Magnet();										// Checks all entry points
+bool Sensor_PIR();											// Checks for motion when alarm is active
+bool Sensor_Magnet();										// Checks all entry points
 void Sensor_DHT();											// Checks temperature and humidity
 void Sensor_MQ2();											// Checks for air quality
 void Sensor_Card();											// Checks for valid RFID card

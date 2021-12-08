@@ -32,7 +32,7 @@ void Init_Displays()
 void Init_Servo()
 {
 	sWindow.attach(SERVO_WINDOW);
-	sGarage.attach(SERVO_GARAGE);	
+	sGarage.attach(SERVO_GARAGE);
 }
 
 void Init_Sensors()
@@ -45,6 +45,7 @@ void Init_Sensors()
 	pinMode(LED_RED, OUTPUT);
 	pinMode(LED_GREEN, OUTPUT);
 	pinMode(LED_BLUE, OUTPUT);
+	pinMode(LED_POLICE, OUTPUT);
 }
 
 void Init_Comms()
@@ -65,6 +66,51 @@ void setup()
 
 void loop()
 {
-
-
+	Alarm(5000);
+	Climate(10000);
+	Entry(5000);
+	KeyIn();
+	display.clearDisplay();
+	UpdateOLED(500);
 }
+
+void Alarm(int interval)
+{
+	if (!AlarmOn) return;
+	PrintLCD(5, 0, "ARMED");
+	digitalWrite(LED_ALARM, true);
+	if ((currentTime - delayAlarm) > interval)
+	{
+		delayAlarm = millis();
+		bool sensPir = Sensor_PIR();
+		bool sensMag = Sensor_Magnet();
+		if (sensPir || sensMag)
+		{
+			// TODO INTERRUPT
+			digitalWrite(LED_POLICE, true);
+			if (sensPir)		{ SerialLog("Motion detected!", "Motion sensor, living room"); }
+			else				{ SerialLog("Intrusion detected, door forced open!", "Door sensor, front door"); }
+		}
+	}
+}
+
+bool Sensor_PIR()
+{
+	if (digitalRead(PIR))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool Sensor_Magnet()
+{
+	if (digitalRead(REED_SWITCH))
+	{
+		return false;
+	}
+	return true;
+}
+
+
+
