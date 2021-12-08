@@ -2,6 +2,7 @@
 // Servos
 Servo sWindow;
 Servo sGarage;
+Servo servos[] = { sWindow, sGarage };
 // LCD
 LiquidCrystal lcd(49, 47, 45, 43, 41, 39);
 // Keypad incl. keypad pins
@@ -81,6 +82,7 @@ void SerialLog(String logEvent, String device)
 	msg += " " + device + " " + logEvent;
 	Serial.println(msg);
 }
+
 String AdjustZero(int val)
 {
 	String result = "0";
@@ -108,6 +110,41 @@ String GetTime()
 	result += AdjustZero(myClock.now().minute()) + ":";
 	result += AdjustZero(myClock.now().second());
 	return result;
+}
+
+String GetTimestamp()
+{
+	String result = "";
+	result += String(myClock.now().year()) + "/";
+	result += AdjustZero(myClock.now().month()) + "/";
+	result += AdjustZero(myClock.now().day()) + " - ";
+	result += GetTime();
+	return result;
+}
+
+void RunServo(int servo, int angle)
+{
+	servos[servo].write(angle);
+}
+
+void PrintLCD(int place, int line, String text)
+{
+	lcd.setCursor(place, line);
+	lcd.print(text);
+}
+
+void WriteLCD(int place, int line, byte icon)
+{
+	lcd.setCursor(place, line);
+	lcd.write(byte(icon));
+}
+
+void PrintOLED(int x, int y, String text, int textSize)
+{	
+	display.setTextSize(textSize);
+	display.setTextColor(WHITE);
+	display.setCursor(x, y);
+	display.println(text);
 }
 
 #pragma endregion
@@ -151,5 +188,3 @@ bool Sensor_Magnet()
 	return true;
 }
 #pragma endregion
-
-
