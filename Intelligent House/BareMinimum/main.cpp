@@ -284,7 +284,7 @@ void Entry(int interval)
 			{
 				NumAct = true;
 				PrintLCD(0, 1, "Enter code:");
-				SerialLog("APPROVED");
+				SerialLog("APPROVED", "Front door card reader");
 				return;
 			}
 			else

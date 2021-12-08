@@ -109,7 +109,7 @@ bool Sensor_PIR();											// Checks for motion when alarm is active
 bool Sensor_Magnet();										// Checks all entry points
 String Sensor_DHT();										// Checks temperature and humidity
 void Sensor_MQ2();											// Checks for air quality
-bool Sensor_Card();											// Checks for valid RFID card
+String Sensor_Card();										// Checks for valid RFID card
 void EnterPassword();										// Enables possibility to enter password
 void CheckPassword();										// Checks the entered password
 
