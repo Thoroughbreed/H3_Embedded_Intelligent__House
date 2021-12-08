@@ -147,6 +147,12 @@ void PrintOLED(int x, int y, String text, int textSize)
 	display.println(text);
 }
 
+bool Hysterese(float val, float high, float low /* = 0 */)
+{
+	if (val < high && val > low)	{ return true;  }
+	else							{ return false; }
+}
+
 #pragma endregion
 
 #pragma region Alarm
@@ -188,3 +194,71 @@ bool Sensor_Magnet()
 	return true;
 }
 #pragma endregion
+
+#pragma region Climate
+
+void Climate()
+{
+	PrintOLED(0,  30, Sensor_DHT(), 2);
+	Sensor_MQ2();
+}
+
+String Sensor_DHT()
+{
+	float t = dht.readTemperature();
+	float h = dht.readHumidity();
+	// Temp control
+	if (!Hysterese(t, 30, 20))
+	{
+		if (!AlarmOn)
+		{
+			if (t < 20) { digitalWrite(LED_RED,  true); }
+			else		{ digitalWrite(LED_BLUE, true); }
+		}
+		else
+		{
+			SerialLog(String("Temperature is outside boundary (currently " + t + "C"), "Climate sensor, living room");
+		}
+	}
+	else
+	{
+		digitalWrite(LED_RED, false);
+		digitalWrite(LED_BLUE, false);
+		digitalWrite(LED_GREEN, true);
+	}
+	
+	// Humidity control
+	if (!Hysterese(h, 80))
+	{
+		if (!AlarmOn && servoWinPos < 180) { servoWinPos += 18; }
+		else 
+		{
+			SerialLog(String("Humidity is over 80% (currently " + h + "%)"), "Climate sensor, living room");
+		}
+	}
+	else	{ servoWinPos = 0; }
+		
+	RunServo(WINDOW, servoWinPos);
+	return String(t + "C" + " " + h + "rH");
+}
+
+void Sensor_MQ2()
+{
+	int ppm = analogRead(AIR);
+	if (!Hysterese(ppm, 600))
+	{
+		if (!AlarmOn && servoGaragePos < 90) { servoGaragePos += 23; }
+		else
+		{
+			SerialLog("Alert! Gas leak - Opening door!", "Air quality sensor, garage");
+		}
+	}
+	else	{ servoGaragePos = 0; }
+		
+	RunServo(GARAGE, servoGaragePos)
+}
+
+#pragma endregion
+
+
+

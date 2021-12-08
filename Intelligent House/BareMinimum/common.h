@@ -95,6 +95,7 @@ String GetDate();											// Gets date from RTC and parses it as DD/MM/YYYY
 String GetTimestamp();										// Returns a string with YY/MM/DD HH:MM:SS
 void PrintOLED(int x, int y, String text, int textSize = 1);// Prints text on the OLED at pixel placement (!!)
 void SerialLog(String logEvent, String device);				// Writes important events through the serial port (115200 baud)
+bool Hysterese(float val, float high, float low = 0);		// Returns true if value is good
 
 // Loop functions
 void Alarm(int interval);									// Controls if the alarm system is active
@@ -106,8 +107,8 @@ void UpdateOLED(int interval);								// Loops around and clears the OLED and up
 // Nested functions
 bool Sensor_PIR();											// Checks for motion when alarm is active
 bool Sensor_Magnet();										// Checks all entry points
-void Sensor_DHT();											// Checks temperature and humidity
-void Sensor_MQ2();											// Checks for air quality
+String Sensor_DHT();										// Checks temperature and humidity
+void Sensor_MQ2();										// Checks for air quality
 void Sensor_Card();											// Checks for valid RFID card
 void EnterPassword();										// Enables possibility to enter password
 void CheckPassword();										// Checks the entered password
