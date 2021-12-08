@@ -74,6 +74,45 @@ void loop()
 	UpdateOLED(500);
 }
 
+#pragma region OnDemand functions
+void SerialLog(String logEvent, String device)
+{
+	String msg = GetTimestamp();
+	msg += " " + device + " " + logEvent;
+	Serial.println(msg);
+}
+String AdjustZero(int val)
+{
+	String result = "0";
+	if (val <= 9)
+	{
+		result += String(val);
+		return result;
+	}
+	return String(val);
+}
+
+String GetDate()
+{
+	String result = "";
+	result += AdjustZero(myClock.now().day()) + "/";
+	result += AdjustZero(myClock.now().month()) + "/";
+	result += String(myClock.now().year());
+	return result;
+}
+
+String GetTime()
+{
+	String result = "";
+	result += AdjustZero(myClock.now().hour()) + ":";
+	result += AdjustZero(myClock.now().minute()) + ":";
+	result += AdjustZero(myClock.now().second());
+	return result;
+}
+
+#pragma endregion
+
+#pragma region Alarm
 void Alarm(int interval)
 {
 	if (!AlarmOn) return;
@@ -111,6 +150,6 @@ bool Sensor_Magnet()
 	}
 	return true;
 }
-
+#pragma endregion
 
 
