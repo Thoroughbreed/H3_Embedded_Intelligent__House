@@ -197,10 +197,14 @@ bool Sensor_Magnet()
 
 #pragma region Climate
 
-void Climate()
+void Climate(int interval)
 {
-	PrintOLED(0,  30, Sensor_DHT(), 2);
-	Sensor_MQ2();
+	if ((currentTime - delayClimate) > interval)
+	{
+		delayClimate = millis();
+		PrintOLED(0,  30, Sensor_DHT(), 2);
+		Sensor_MQ2();
+	}
 }
 
 String Sensor_DHT()
@@ -217,7 +221,7 @@ String Sensor_DHT()
 		}
 		else
 		{
-			SerialLog(String("Temperature is outside boundary (currently " + t + "C"), "Climate sensor, living room");
+			SerialLog(String("Temperature is outside boundary (currently " + String(t) + "C"), "Climate sensor, living room");
 		}
 	}
 	else
@@ -233,13 +237,13 @@ String Sensor_DHT()
 		if (!AlarmOn && servoWinPos < 180) { servoWinPos += 18; }
 		else 
 		{
-			SerialLog(String("Humidity is over 80% (currently " + h + "%)"), "Climate sensor, living room");
+			SerialLog(String("Humidity is over 80% (currently " + String(h) + "%)"), "Climate sensor, living room");
 		}
 	}
 	else	{ servoWinPos = 0; }
 		
 	RunServo(WINDOW, servoWinPos);
-	return String(t + "C" + " " + h + "rH");
+	return String(String(t) + "C" + " " + String(h) + "rH");
 }
 
 void Sensor_MQ2()
@@ -255,10 +259,67 @@ void Sensor_MQ2()
 	}
 	else	{ servoGaragePos = 0; }
 		
-	RunServo(GARAGE, servoGaragePos)
+	RunServo(GARAGE, servoGaragePos);
 }
 
 #pragma endregion
+
+#pragma region Entry and keypad
+
+void Entry(int interval)
+{
+	if (!AlarmOn) return;
+	String cardUid = "";
+	if ((currentTime - delayEntry) > interval)
+	{
+		delayEntry = millis();
+		PrintLCD(0, 1, "            ");
+		cardUid = Sensor_Card();
+		if (cardUid == "") return;
+		
+		SerialLog(cardUid, "Front door card reader");
+		for (i = 0; i < 2; i++)
+		{
+			if (approvedCards[i] == cardUid)
+			{
+				NumAct = true;
+				PrintLCD(0, 1, "Enter code:");
+				SerialLog("APPROVED");
+				return;
+			}
+			else
+			{
+				PrintLCD(0, 1, "  --DENIED!--");
+				NumAct = false;
+			}
+		}
+	}
+}
+
+String Sensor_Card()
+{
+	String result = "";
+	if ( !mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial() ) {
+		delay(50);
+		return result;
+	}
+	
+	for (byte i = 0; i < mfrc522.uid.size; i++)
+	{
+		result = result + String(mfrc522.uid.uidByte[i], HEX);
+	}
+	return result;
+}
+
+void KeyIn()
+{
+	
+}
+
+#pragma endregion
+
+
+
 
 
 
