@@ -21,7 +21,7 @@ char keys[COLS][ROWS] = {
 	{'*', '0', '#', 'D'}
 };															// Keypad layout
 Keypad keypad = Keypad(makeKeymap(keys), rowPins,
-								colPins, ROWS, COLS);		// Create keypad
+colPins, ROWS, COLS);		// Create keypad
 String approvedCards[] = {"76bf341f", "04774d824d5380"};	// Approved UUID from RFID cards
 const char pwd[4] = {'1', '3', '3', '7'};					// The "correct" password for the keypad
 char pwdTest[4];											// Empty array for testing the PW
@@ -39,20 +39,18 @@ long delayClimate = 0;										// Placeholder for timer2
 long delayEntry = 0;										// Placeholder for timer3
 long delayOLED = 0;											// Placeholder for timer4
 long delayLog = 0;											// Placeholder for timer5
-long currentTime;											// Current time
 
 String lastDisarm = "";										// Last disarm time
 String lastArm = "";										// Last arm time
 String lastEvent = "";										// Last event time
 String climatePrint = "";									// Shows climate on OLED
 
-bool locked = false;										// Is the door locked?
 bool AlarmOn = true;										// Is the system armed? (Starts with alarm ON)
 bool PerimOn = false;										// Perimeter system armed?)
 bool ArmSystem = false;										// Prepare to arm the system
 bool ArmPerim = false;										// Only activates perimeter system
 bool ShowLog = false;										// Swaps to show log on OLED
-
+bool NumAct = false;
 
 #pragma region Initial setup
 void Init_Displays()
@@ -105,11 +103,10 @@ void setup()
 
 void loop()
 {
-	currentTime = millis();
 	Alarm(5000);
 	Climate(10000);
-	bool numAct = Entry(5000);
-	KeyIn(numAct);
+	Entry(5000);
+	KeyIn();
 	UpdateOLED(500);
 }
 
@@ -179,7 +176,7 @@ void WriteLCD(int place, int line, byte icon)
 }
 
 void PrintOLED(int x, int y, String text, int textSize)
-{	
+{
 	display.setTextSize(textSize);
 	display.setTextColor(WHITE);
 	display.setCursor(x, y);
@@ -199,10 +196,10 @@ void Alarm(int interval)
 	if (!AlarmOn) return;
 	bool sensPir = false;
 	PrintLCD(0, 0, "     ARMED");
-// DEBUG
-//	PrintLCD(0, 1, "                ");
+	// DEBUG
+	//	PrintLCD(0, 1, "                ");
 	digitalWrite(LED_ALARM, true);
-	if ((currentTime - delayAlarm) > interval)
+	if ((millis() - delayAlarm) > interval)
 	{
 		delayAlarm = millis();
 		if (!ArmPerim)
@@ -243,7 +240,7 @@ bool Sensor_Magnet()
 #pragma region Climate
 void Climate(int interval)
 {
-	if ((currentTime - delayClimate) > interval)
+	if ((millis() - delayClimate) > interval)
 	{
 		delayClimate = millis();
 		climatePrint = Sensor_DHT();
@@ -279,13 +276,13 @@ String Sensor_DHT()
 	if (!Hysterese(h, 65))
 	{
 		if (!AlarmOn && servoWinPos < 180) { servoWinPos += 18; }
-		else 
+		else
 		{
 			SerialLog(String("Humidity is over 65% (currently " + String(h) + "%)"), "Climate sensor, living room");
 		}
 	}
 	else	{ servoWinPos = 0; }
-		
+	
 	RunServo(WINDOW, servoWinPos);
 	return String(String(t) + "C" + " " + String(h) + "%rH");
 }
@@ -304,23 +301,23 @@ void Sensor_MQ2()
 		}
 	}
 	else	{ servoGaragePos = 0; }
-		
+	
 	RunServo(GARAGE, servoGaragePos);
 }
 #pragma endregion
 
 #pragma region Entry and keypad
-bool Entry(int interval)
+void Entry(int interval)
 {
 	String cardUid = Sensor_Card();
-	if ((currentTime - delayEntry) > interval)
+	if ((millis() - delayEntry) > interval)
 	{
 		delayEntry = millis();
 		PrintLCD(0, 1, "                ");
 		ArmSystem = false;
 		ArmPerim = false;
-		if (cardUid == "") return false;
-		if (!AlarmOn) return false;
+		if (cardUid == "") return;
+		if (!AlarmOn) return;
 		
 		SerialLog(cardUid, "Front door card reader");
 		for (int i = 0; i < 2; i++)
@@ -329,15 +326,15 @@ bool Entry(int interval)
 			{
 				PrintLCD(0, 1, "Enter code:");
 				SerialLog("APPROVED", "Front door card reader");
-				return true;
+				NumAct = true;
 			}
 			else
 			{
-				PrintLCD(0, 1, "  --DENIED!--");
+				PrintLCD(0, 1, "   --DENIED--   ");
 				SerialLog("DENIED", "Front door card reader");
+				NumAct = false;
 			}
 		}
-		return false;
 	}
 }
 
@@ -357,7 +354,7 @@ String Sensor_Card()
 	return result;
 }
 
-void KeyIn(bool NumAct)
+void KeyIn()
 {
 	char key = keypad.getKey();
 	if (key != NO_KEY)
@@ -373,7 +370,7 @@ void KeyIn(bool NumAct)
 				ArmPerim = true;
 			break;
 			case 'C':
-				ShowLog = true;
+				ShowLog	= true;
 			break;
 			case 'D':
 				// Delete
@@ -408,12 +405,14 @@ void KeyIn(bool NumAct)
 				}
 			break;
 			default:
-				if (!NumAct)
+				if (NumAct)
+				{
+					EnterPassword(key);
+				}
+				else
 				{
 					pwdCount = 0;
-					break;
 				}
-				EnterPassword(key);
 			break;
 		}
 	}
@@ -426,7 +425,6 @@ void Unlock()
 	PrintLCD(0, 0, "Welcome");
 	WriteLCD(8, 0, 0);
 	AlarmOn = false;
-	locked = false;
 	digitalWrite(LED_ALARM, false);
 	digitalWrite(LED_POLICE, false);
 	SerialLog("System disarmed", "Front door keypad");
@@ -441,7 +439,7 @@ bool CheckPassword()
 		pwdTest[0] = 0;
 		return true;
 	}
-	return false;	
+	return false;
 }
 
 void EnterPassword(char key)
@@ -467,7 +465,7 @@ void EnterPassword(char key)
 #pragma region OLED
 void UpdateOLED(int interval)
 {
-	if ((currentTime - delayOLED) > interval)
+	if ((millis() - delayOLED) > interval)
 	{
 		delayOLED = millis();
 		display.clearDisplay();
@@ -494,7 +492,7 @@ void UpdateOLED(int interval)
 		}
 		display.display();
 	}
-	if ((currentTime - delayLog) > 10000)
+	if ((millis() - delayLog) > 10000)
 	{
 		delayLog = millis();
 		ShowLog = false;
