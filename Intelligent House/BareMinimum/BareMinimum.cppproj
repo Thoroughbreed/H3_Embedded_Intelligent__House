@@ -313,6 +313,12 @@
     <Compile Include="common.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="entry\entry.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="entry\entry.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\libraries\Adafruit_BusIO\Adafruit_BusIO_Register.h">
       <SubType>compile</SubType>
     </Compile>
@@ -701,6 +707,7 @@
     <Folder Include="include\libraries\Wire\src\utility\" />
     <Folder Include="alarm" />
     <Folder Include="climate" />
+    <Folder Include="entry" />
     <Folder Include="shared" />
     <Folder Include="src\" />
     <Folder Include="src\libraries\" />

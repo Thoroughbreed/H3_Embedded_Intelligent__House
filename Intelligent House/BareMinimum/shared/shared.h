@@ -24,6 +24,10 @@
 #define SCREEN_HEIGHT 64
 #define OLED_RESET 4
 
+
+void Init_Displays();
+void Init_Servo();
+
 void PrintLCD(int place, int line, String text);			// Prints a text on the LCD from the given placement
 void WriteLCD(int place, int line, byte icon);				// Prints an icon on the LCD at the given placement
 void RunServo(int servo, int angle);						// Runs servo on the given angle
@@ -36,8 +40,6 @@ void SerialLog(String logEvent, String device,
 						bool error = false);				// Writes important events through the serial port (115200 baud)
 bool Hysterese(float val, float high, float low = 0);		// Returns true if value is good
 void UpdateOLED(int interval);								// Loops around and clears the OLED and updates timestamp
-
-
 
 
 #endif /* SHARED_H_ */

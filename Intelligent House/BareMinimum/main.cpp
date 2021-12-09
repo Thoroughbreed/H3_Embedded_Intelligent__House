@@ -1,37 +1,20 @@
 ﻿#include "common.h"
 
+#pragma region Variables
+// EXTERNAL VARIABLES
+extern bool ShowLog;
+extern String lastDisarm;									// Last disarm time
+extern String lastArm;										// Last arm time
+extern String lastEvent;									// Last event time
+
+// GLOBAL VARIABLES
 bool AlarmOn = true;										// Is the system armed? (Starts with alarm ON)
 bool PerimOn = false;										// Perimeter system armed?)
 bool ArmSystem = false;										// Prepare to arm the system
 bool ArmPerim = false;										// Only activates perimeter system
-extern bool ShowLog;
-
-// KEYPAD
-byte rowPins[ROWS] = {37, 36, 35, 34};						// Pin numbering for rows in keypad
-byte colPins[COLS] = {33, 32, 31, 30};						// Pin numbering for columns in keypad
-char keys[COLS][ROWS] = {
-	{'1', '2', '3', 'A'},
-	{'4', '5', '6', 'B'},
-	{'7', '8', '9', 'C'},
-	{'*', '0', '#', 'D'}
-};															// Keypad layout
-String approvedCards[] = {"76bf341f", "04774d824d5380"};	// Approved UUID from RFID cards
-const char pwd[4] = {'1', '3', '3', '7'};					// The "correct" password for the keypad
-char pwdTest[4];											// Empty array for testing the PW
-
-int pwdCount = 0;											// Counting number of chars in the PW test
-
-long delayEntry = 0;										// Placeholder for timer3
-
-extern String lastDisarm;// = "";										// Last disarm time
-extern String lastArm;// = "";										// Last arm time
-extern String lastEvent;// = "";										// Last event time
 String climatePrint = "";									// Shows climate on OLED
-
-
-bool NumAct = false;										// Is the numpad active?
-
-
+#pragma endregion
+#pragma region "Objects"
 // Servos
 Servo sWindow;
 Servo sGarage;
@@ -39,17 +22,24 @@ Servo servos[] = { sWindow, sGarage };
 // LCD
 LiquidCrystal lcd(49, 47, 45, 43, 41, 39);
 // Keypad incl. keypad pins
+const char keys[COLS][ROWS] = {
+	{'1', '2', '3', 'A'},
+	{'4', '5', '6', 'B'},
+	{'7', '8', '9', 'C'},
+	{'*', '0', '#', 'D'}
+};
+byte rowPins[ROWS] = {37, 36, 35, 34};						// Pin numbering for rows in keypad
+byte colPins[COLS] = {33, 32, 31, 30};						// Pin numbering for columns in keypad
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 // OLED Display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 // NFC reader
 MFRC522 mfrc522(SS_PIN, RST_PIN);
-MFRC522::MIFARE_Key mfKey;
 // RTC
 RTClib myClock;
 // DHT
 DHT dht(DHT_PIN, DHTTYPE);
-
+#pragma endregion
 
 #pragma region Initial setup
 void Init_Sensors()
@@ -89,158 +79,3 @@ void loop()
 	KeyIn();
 	UpdateOLED(500);
 }
-
-#pragma region Entry and keypad
-void Entry(int interval)
-{
-	if ((millis() - delayEntry) > interval)
-	{
-		String cardUid = Sensor_Card();
-		delayEntry = millis();
-		PrintLCD(0, 1, "                ");
-		ArmSystem = false;
-		ArmPerim = false;
-		if (cardUid == "") return;
-		if (!AlarmOn) return;
-		
-		SerialLog(cardUid, "Front door card reader");
-		for (int i = 0; i < 2; i++)
-		{
-			if (approvedCards[i] == cardUid)
-			{
-				NumAct = true;
-				PrintLCD(0, 1, "Enter code:");
-				SerialLog("APPROVED", "Front door card reader");
-				return;
-			}
-			else
-			{
-				PrintLCD(0, 1, "   --DENIED--   ");
-				SerialLog("DENIED", "Front door card reader");
-				NumAct = false;
-			}
-		}
-	}
-}
-
-String Sensor_Card()
-{
-	String result = "";
-	if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
-	{
-		delay(50);
-		return result;
-	}
-	
-	for (byte i = 0; i < mfrc522.uid.size; i++)
-	{
-		result = result + String(mfrc522.uid.uidByte[i], HEX);
-	}
-	return result;
-}
-
-void KeyIn()
-{
-	char key = keypad.getKey();
-	if (key != NO_KEY)
-	{
-		switch (key)
-		{
-			case 'A':
-				PrintLCD(0, 1, "Arm system?");
-				ArmSystem = true;
-			break;
-			case 'B':
-				PrintLCD(0, 1, "Arm perim?");
-				ArmPerim = true;
-			break;
-			case 'C':
-				ShowLog = true;
-			break;
-			case 'D':
-				// Delete
-			break;
-			case '*':
-				pwdCount = 0;
-				if (CheckPassword())
-				{
-					Unlock();
-				}
-				else
-				{
-					PrintLCD(0, 1, "  --DENIED!--");
-					SerialLog("Wrong pin", "Front door keypad", true);
-				}
-			break;
-			case '#':
-				if(ArmSystem)
-				{
-					AlarmOn = true;
-					PrintLCD(0, 1, "                ");
-					SerialLog("SYSTEM ARMED", "Front door keypad");
-					lastArm = GetTimestamp();
-				}
-				if (ArmPerim)
-				{
-					AlarmOn = true;
-					PerimOn = true;
-					PrintLCD(0, 1, "                ");
-					SerialLog("PERIMETER ARMED", "Front door keypad");
-					lastArm = GetTimestamp();
-				}
-			break;
-			default:
-				if (!NumAct)
-				{
-					pwdCount = 0;
-					break;
-				}
-				EnterPassword(key);
-			break;
-		}
-	}
-}
-
-void Unlock()
-{
-	PrintLCD(0, 0, "                ");
-	PrintLCD(0, 1, "                ");
-	PrintLCD(0, 0, "Welcome");
-	WriteLCD(8, 0, 0);
-	AlarmOn = false;
-	digitalWrite(LED_ALARM, false);
-	digitalWrite(LED_POLICE, false);
-	SerialLog("System disarmed", "Front door keypad");
-	lastDisarm = GetTimestamp();
-}
-
-bool CheckPassword()
-{
-	// Logic testing of the password
-	if (pwdTest[0] == pwd[0] && pwdTest[1] == pwd[1] && pwdTest[2] == pwd[2] && pwdTest[3] == pwd[3])
-	{
-		pwdTest[0] = 0;
-		return true;
-	}
-	return false;	
-}
-
-void EnterPassword(char key)
-{
-	if (pwdCount <= 3)
-	{
-		pwdTest[pwdCount] = key;
-		PrintLCD(12, 1, "    ");
-		for (int i = 0; i <= pwdCount; i++)
-		{
-			PrintLCD(i + 12, 1, "*");
-		}
-		pwdCount++;
-	}
-	else
-	{
-		pwdCount = 0;
-		PrintLCD(12, 1, "    ");
-	}
-}
-#pragma endregion
