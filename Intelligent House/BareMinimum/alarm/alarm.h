@@ -9,7 +9,6 @@
 #ifndef ALARM_H_
 #define ALARM_H_
 
-
 // Debug/proof of concept LED
 #define LED_ALARM 2
 #define LED_POLICE 6
