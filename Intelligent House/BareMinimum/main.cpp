@@ -67,6 +67,7 @@ void setup()
 
 void loop()
 {
+	currentTime = millis();
 	Alarm(5000);
 	Climate(10000);
 	Entry(5000);
@@ -167,6 +168,7 @@ void Alarm(int interval)
 		delayAlarm = millis();
 		bool sensPir = Sensor_PIR();
 		bool sensMag = Sensor_Magnet();
+		digitalWrite(LED_POLICE, false);
 		if (sensPir || sensMag)
 		{
 			// TODO INTERRUPT
@@ -190,9 +192,9 @@ bool Sensor_Magnet()
 {
 	if (digitalRead(REED_SWITCH))
 	{
-		return false;
+		return true;
 	}
-	return true;
+	return false;
 }
 #pragma endregion
 
@@ -269,14 +271,14 @@ void Sensor_MQ2()
 
 void Entry(int interval)
 {
-	if (!AlarmOn) return;
 	String cardUid = "";
 	if ((currentTime - delayEntry) > interval)
 	{
 		delayEntry = millis();
 		PrintLCD(0, 1, "            ");
-		cardUid = Sensor_Card();
 		ArmSystem = false;
+		if (!AlarmOn) return;
+		cardUid = Sensor_Card();
 		if (cardUid == "") return;
 		
 		SerialLog(cardUid, "Front door card reader");
@@ -360,11 +362,14 @@ void KeyIn()
 
 void Unlock()
 {
+	PrintLCD(0, 0, "                ");
+	PrintLCD(0, 1, "                ");
 	PrintLCD(0, 0, "Welcome");
 	WriteLCD(8, 0, 0);
 	AlarmOn = false;
 	locked = false;
 	digitalWrite(LED_ALARM, false);
+	digitalWrite(LED_POLICE, false);
 	SerialLog("System disarmed", "Front door keypad");
 	lastDisarm = GetTimestamp();
 }
