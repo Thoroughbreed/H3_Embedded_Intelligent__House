@@ -72,8 +72,7 @@ void loop()
 	Climate(10000);
 	Entry(5000);
 	KeyIn();
-	display.clearDisplay();
-//	UpdateOLED(500);
+	UpdateOLED(500);
 }
 
 #pragma region OnDemand functions
@@ -161,20 +160,25 @@ bool Hysterese(float val, float high, float low /* = 0 */)
 void Alarm(int interval)
 {
 	if (!AlarmOn) return;
-	PrintLCD(5, 0, "ARMED");
+	bool sensPir = false;
+	PrintLCD(0, 0, "     ARMED");
+	PrintLCD(0, 1, "                ");
 	digitalWrite(LED_ALARM, true);
 	if ((currentTime - delayAlarm) > interval)
 	{
 		delayAlarm = millis();
-		bool sensPir = Sensor_PIR();
+		if (!ArmPerim)
+		{
+			sensPir = Sensor_PIR();
+		}
 		bool sensMag = Sensor_Magnet();
 		digitalWrite(LED_POLICE, false);
 		if (sensPir || sensMag)
 		{
 			// TODO INTERRUPT
 			digitalWrite(LED_POLICE, true);
-			if (sensPir)		{ SerialLog("Motion detected!", "Motion sensor, living room"); }
-			else				{ SerialLog("Intrusion detected, door forced open!", "Door sensor, front door"); }
+			if (sensPir)		{ SerialLog("Motion detected!", "Motion sensor, living room", true); }
+			else				{ SerialLog("Intrusion detected, door forced open!", "Door sensor, front door", true); }
 		}
 	}
 }
@@ -205,15 +209,15 @@ void Climate(int interval)
 	if ((currentTime - delayClimate) > interval)
 	{
 		delayClimate = millis();
-		PrintOLED(0,  30, Sensor_DHT(), 2);
+		climatePrint = Sensor_DHT();
 		Sensor_MQ2();
 	}
 }
 
 String Sensor_DHT()
 {
-	float t = dht.readTemperature();
-	float h = dht.readHumidity();
+	int t = dht.readTemperature();
+	int h = dht.readHumidity();
 	// Temp control
 	if (!Hysterese(t, 30, 20))
 	{
@@ -246,7 +250,7 @@ String Sensor_DHT()
 	else	{ servoWinPos = 0; }
 		
 	RunServo(WINDOW, servoWinPos);
-	return String(String(t) + "C" + " " + String(h) + "rH");
+	return String(String(t) + "C" + " " + String(h) + "%rH");
 }
 
 void Sensor_MQ2()
@@ -257,7 +261,7 @@ void Sensor_MQ2()
 		if (!AlarmOn && servoGaragePos < 90) { servoGaragePos += 23; }
 		else
 		{
-			SerialLog("Alert! Gas leak - Opening door!", "Air quality sensor, garage");
+			SerialLog("Alert! Gas leak - Opening door!", "Air quality sensor, garage", true);
 		}
 	}
 	else	{ servoGaragePos = 0; }
@@ -271,15 +275,15 @@ void Sensor_MQ2()
 
 void Entry(int interval)
 {
-	String cardUid = "";
+	String cardUid = Sensor_Card();
 	if ((currentTime - delayEntry) > interval)
 	{
 		delayEntry = millis();
-		PrintLCD(0, 1, "            ");
+		PrintLCD(0, 1, "                ");
 		ArmSystem = false;
-		if (!AlarmOn) return;
-		cardUid = Sensor_Card();
+		ArmPerim = false;
 		if (cardUid == "") return;
+		if (!AlarmOn) return;
 		
 		SerialLog(cardUid, "Front door card reader");
 		for (i = 0; i < 2; i++)
@@ -326,14 +330,13 @@ void KeyIn()
 			case 'A':
 				PrintLCD(0, 1, "Arm system?");
 				ArmSystem = true;
-				SerialLog("SYSTEM ARMED", "Front door keypad");
-				lastArm = GetTimestamp();
 			break;
 			case 'B':
-				// Show log on OLED
+				PrintLCD(0, 1, "Arm perim?");
+				ArmPerim = true;
 			break;
 			case 'C':
-				// Clear curr. log
+				ShowLog = true;
 			break;
 			case 'D':
 				// Delete
@@ -347,13 +350,32 @@ void KeyIn()
 				else
 				{
 					PrintLCD(0, 1, "  --DENIED!--");
-					SerialLog("Wrong pin", "Front door keypad");
+					SerialLog("Wrong pin", "Front door keypad", true);
 				}
 			break;
 			case '#':
-				if(ArmSystem) { AlarmOn = true; }
+				if(ArmSystem)
+				{
+					AlarmOn = true;
+					PrintLCD(0, 1, "                ");
+					SerialLog("SYSTEM ARMED", "Front door keypad");
+					lastArm = GetTimestamp();
+				}
+				if (ArmPerim)
+				{
+					AlarmOn = true;
+					PerimOn = true;
+					PrintLCD(0, 1, "                ");
+					SerialLog("PERIMETER ARMED", "Front door keypad");
+					lastArm = GetTimestamp();
+				}
 			break;
 			default:
+				if (!NumAct)
+				{
+					pwdCount = 0;
+					break;
+				}
 				EnterPassword(key);
 			break;
 		}
@@ -390,23 +412,61 @@ void EnterPassword(char key)
 	if (pwdCount <= 3)
 	{
 		pwdTest[pwdCount] = key;
-		PrintLCD(11, 1, "    ");
+		PrintLCD(12, 1, "    ");
 		for (i = 0; i <= pwdCount; i++)
 		{
-			PrintLCD(i + 11, 1, "*");
+			PrintLCD(i + 12, 1, "*");
 		}
 		pwdCount++;
 	}
 	else
 	{
 		pwdCount = 0;
-		PrintLCD(11, 1, "    ");
+		PrintLCD(12, 1, "    ");
 	}
 }
 
 #pragma endregion
 
+#pragma region OLED
 
+void UpdateOLED(int interval)
+{
+	if ((currentTime - delayOLED) > interval)
+	{
+		delayOLED = millis();
+		display.clearDisplay();
+		if (!ShowLog)
+		{
+			PrintOLED(0, 0, GetDate());
+			PrintOLED(0, 8, GetTime(), 2);
+			PrintOLED(0, 49, climatePrint, 2);
+		}
+		else if (ShowLog)
+		{
+			if (!AlarmOn)
+			{
+				PrintOLED(0, 0, "Disarmed:");
+				PrintOLED(0, 8, lastDisarm);
+			}
+			else
+			{
+				PrintOLED(0, 0, "Armed:");
+				PrintOLED(0, 8, lastArm);
+			}
+			PrintOLED(0, 18, "Event:");
+			PrintOLED(0, 26, lastEvent);
+		}
+		display.display();
+	}
+	if ((currentTime - delayLog) > 10000)
+	{
+		delayLog = millis();
+		ShowLog = false;
+	}
+}
+
+#pragma endregion
 
 
 

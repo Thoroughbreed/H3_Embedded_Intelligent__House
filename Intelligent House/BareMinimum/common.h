@@ -73,16 +73,21 @@ long delayAlarm = 0;										// Placeholder for timer1
 long delayClimate = 0;										// Placeholder for timer2
 long delayEntry = 0;										// Placeholder for timer3
 long delayOLED = 0;											// Placeholder for timer4
+long delayLog = 0;											// Placeholder for timer5
 long currentTime;											// Current time
 
 String lastDisarm = "";										// Last disarm time
 String lastArm = "";										// Last arm time
 String lastEvent = "";										// Last event time
+String climatePrint = "";									// Shows climate on OLED
 
 bool locked = false;										// Is the door locked?
-bool AlarmOn = false;										// Is the system armed?
+bool AlarmOn = true;										// Is the system armed? (Starts with alarm ON)
+bool PerimOn = false;										// Perimeter system armed?)
 bool ArmSystem = false;										// Prepare to arm the system
+bool ArmPerim = false;										// Only activates perimeter system
 bool NumAct = false;										// Is the numpad active?
+bool ShowLog = false;										// Swaps to show log on OLED
 
 // Initial functions
 void Init_Displays();
