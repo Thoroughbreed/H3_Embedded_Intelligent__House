@@ -304,6 +304,12 @@
     <Compile Include="alarm\alarm.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="climate\climate.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="climate\climate.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="common.h">
       <SubType>compile</SubType>
     </Compile>
@@ -688,6 +694,7 @@
     <Folder Include="include\libraries\Wire\src\" />
     <Folder Include="include\libraries\Wire\src\utility\" />
     <Folder Include="alarm" />
+    <Folder Include="climate" />
     <Folder Include="src\" />
     <Folder Include="src\libraries\" />
     <Folder Include="src\libraries\Adafruit_BusIO\" />

@@ -21,11 +21,9 @@ const char pwd[4] = {'1', '3', '3', '7'};					// The "correct" password for the 
 char pwdTest[4];											// Empty array for testing the PW
 
 int pwdCount = 0;											// Counting number of chars in the PW test
-int i = 0;													// For i
 int servoWinPos = 0;										// Initial position for Servo1
 int servoGaragePos = 0;										// Initial position for Servo2
 
-long delayClimate = 0;										// Placeholder for timer2
 long delayEntry = 0;										// Placeholder for timer3
 long delayOLED = 0;											// Placeholder for timer4
 long delayLog = 0;											// Placeholder for timer5
@@ -34,6 +32,7 @@ String lastDisarm = "";										// Last disarm time
 String lastArm = "";										// Last arm time
 String lastEvent = "";										// Last event time
 String climatePrint = "";									// Shows climate on OLED
+
 
 bool NumAct = false;										// Is the numpad active?
 bool ShowLog = false;										// Swaps to show log on OLED
@@ -198,73 +197,6 @@ bool Hysterese(float val, float high, float low /* = 0 */)
 
 
 
-#pragma region Climate
-void Climate(int interval)
-{
-	if ((millis() - delayClimate) > interval)
-	{
-		delayClimate = millis();
-		climatePrint = Sensor_DHT();
-		Sensor_MQ2();
-	}
-}
-
-String Sensor_DHT()
-{
-	int t = dht.readTemperature();
-	int h = dht.readHumidity();
-	// Temp control
-	if (!Hysterese(t, 30, 20))
-	{
-		if (!AlarmOn)
-		{
-			if (t < 20) { digitalWrite(LED_RED,  true); }
-			else		{ digitalWrite(LED_BLUE, true); }
-		}
-		else
-		{
-			SerialLog(String("Temperature is outside boundary (currently " + String(t) + "C"), "Climate sensor, living room");
-		}
-	}
-	else
-	{
-		digitalWrite(LED_RED, false);
-		digitalWrite(LED_BLUE, false);
-		digitalWrite(LED_GREEN, true);
-	}
-	
-	// Humidity control
-	if (!Hysterese(h, 65))
-	{
-		if (!AlarmOn && servoWinPos < 180) { servoWinPos += 18; }
-		else 
-		{
-			SerialLog(String("Humidity is over 65% (currently " + String(h) + "%)"), "Climate sensor, living room");
-		}
-	}
-	else	{ servoWinPos = 0; }
-		
-	RunServo(WINDOW, servoWinPos);
-	return String(String(t) + "C" + " " + String(h) + "%rH");
-}
-
-void Sensor_MQ2()
-{
-	int ppm = analogRead(AIR);
-	if (!Hysterese(ppm, 400))
-	{
-		if (!AlarmOn && servoGaragePos < 90) { servoGaragePos += 23; }
-		else
-		{
-			SerialLog("Alert! Gas leak - Opening door!", "Air quality sensor, garage", true);
-		}
-	}
-	else	{ servoGaragePos = 0; }
-		
-	RunServo(GARAGE, servoGaragePos);
-}
-#pragma endregion
-
 #pragma region Entry and keypad
 void Entry(int interval)
 {
@@ -279,7 +211,7 @@ void Entry(int interval)
 		if (!AlarmOn) return;
 		
 		SerialLog(cardUid, "Front door card reader");
-		for (i = 0; i < 2; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			if (approvedCards[i] == cardUid)
 			{
@@ -406,7 +338,7 @@ void EnterPassword(char key)
 	{
 		pwdTest[pwdCount] = key;
 		PrintLCD(12, 1, "    ");
-		for (i = 0; i <= pwdCount; i++)
+		for (int i = 0; i <= pwdCount; i++)
 		{
 			PrintLCD(i + 12, 1, "*");
 		}

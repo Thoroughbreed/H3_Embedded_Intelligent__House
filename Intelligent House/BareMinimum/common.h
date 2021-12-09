@@ -18,9 +18,9 @@
 #include <Wire.h>				// I2C comms
 #include <MFRC522.h>			// RFID reader
 #include <DS3231.h>				// RTC
-#include <DHT.h>				// Temp/hum sensor
 //#include "lcd_icon.h"			// Custom LCD icons
 #include "alarm/alarm.h"		// Alarm functions
+#include "climate/climate.h"	// Climate functions
 
 // Misc defines
 #define LED_RED 3
@@ -34,14 +34,9 @@
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET 4
-// MQ-2 (Air quality)
-#define AIR A0
 // RFID
 #define RST_PIN 13
 #define SS_PIN 53
-// DHT
-#define DHT_PIN 23
-#define DHTTYPE DHT11
 // KEYPAD
 #define ROWS 4												// Number of rows in keypad
 #define COLS 4
@@ -66,14 +61,11 @@ void SerialLog(String logEvent, String device,
 bool Hysterese(float val, float high, float low = 0);		// Returns true if value is good
 
 // Loop functions
-void Climate(int interval);									// Monitors the in-house climate
 void Entry(int interval);									// Checks the entry point if alarm is active
 void KeyIn();												// Controls the keypad input device
 void UpdateOLED(int interval);								// Loops around and clears the OLED and updates timestamp
 
 // Nested functions
-String Sensor_DHT();										// Checks temperature and humidity
-void Sensor_MQ2();											// Checks for air quality
 String Sensor_Card();										// Checks for valid RFID card
 void EnterPassword(char key);								// Enables possibility to enter password
 bool CheckPassword();										// Checks the entered password
