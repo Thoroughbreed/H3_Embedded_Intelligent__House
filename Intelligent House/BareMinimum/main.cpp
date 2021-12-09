@@ -72,15 +72,16 @@ void loop()
 	Entry(5000);
 	KeyIn();
 	display.clearDisplay();
-	UpdateOLED(500);
+//	UpdateOLED(500);
 }
 
 #pragma region OnDemand functions
-void SerialLog(String logEvent, String device)
+void SerialLog(String logEvent, String device, bool error /* = false */)
 {
 	String msg = GetTimestamp();
 	msg += " " + device + " " + logEvent;
 	Serial.println(msg);
+	if (error) { lastEvent = msg; }
 }
 
 String AdjustZero(int val)
@@ -275,6 +276,7 @@ void Entry(int interval)
 		delayEntry = millis();
 		PrintLCD(0, 1, "            ");
 		cardUid = Sensor_Card();
+		ArmSystem = false;
 		if (cardUid == "") return;
 		
 		SerialLog(cardUid, "Front door card reader");
@@ -299,7 +301,8 @@ void Entry(int interval)
 String Sensor_Card()
 {
 	String result = "";
-	if ( !mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial() ) {
+	if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
+	{
 		delay(50);
 		return result;
 	}
@@ -313,7 +316,87 @@ String Sensor_Card()
 
 void KeyIn()
 {
-	
+	char key = keypad.getKey();
+	if (key != NO_KEY)
+	{
+		switch (key)
+		{
+			case 'A':
+				PrintLCD(0, 1, "Arm system?");
+				ArmSystem = true;
+				SerialLog("SYSTEM ARMED", "Front door keypad");
+				lastArm = GetTimestamp();
+			break;
+			case 'B':
+				// Show log on OLED
+			break;
+			case 'C':
+				// Clear curr. log
+			break;
+			case 'D':
+				// Delete
+			break;
+			case '*':
+				pwdCount = 0;
+				if (CheckPassword())
+				{
+					Unlock();
+				}
+				else
+				{
+					PrintLCD(0, 1, "  --DENIED!--");
+					SerialLog("Wrong pin", "Front door keypad");
+				}
+			break;
+			case '#':
+				if(ArmSystem) { AlarmOn = true; }
+			break;
+			default:
+				EnterPassword(key);
+			break;
+		}
+	}
+}
+
+void Unlock()
+{
+	PrintLCD(0, 0, "Welcome");
+	WriteLCD(8, 0, 0);
+	AlarmOn = false;
+	locked = false;
+	digitalWrite(LED_ALARM, false);
+	SerialLog("System disarmed", "Front door keypad");
+	lastDisarm = GetTimestamp();
+}
+
+bool CheckPassword()
+{
+	// Logic testing of the password
+	if (pwdTest[0] == pwd[0] && pwdTest[1] == pwd[1] && pwdTest[2] == pwd[2] && pwdTest[3] == pwd[3])
+	{
+		pwdTest[3] = 0;
+		return true;
+	}
+	return false;	
+}
+
+void EnterPassword(char key)
+{
+	if (pwdCount <= 3)
+	{
+		pwdTest[pwdCount] = key;
+		PrintLCD(11, 1, "    ");
+		for (i = 0; i <= pwdCount; i++)
+		{
+			PrintLCD(i + 11, 1, "*");
+		}
+		pwdCount++;
+	}
+	else
+	{
+		pwdCount = 0;
+		PrintLCD(11, 1, "    ");
+	}
 }
 
 #pragma endregion

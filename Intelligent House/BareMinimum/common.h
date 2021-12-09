@@ -64,7 +64,7 @@ String approvedCards[] = {"76bf341f", "04774d824d5380"};	// Approved UUID from R
 const char pwd[4] = {'1', '3', '3', '7'};					// The "correct" password for the keypad
 char pwdTest[4];											// Empty array for testing the PW
 
-// int pwdCount = 0;											// Counting number of chars in the PW test
+int pwdCount = 0;											// Counting number of chars in the PW test
 int i = 0;													// For i
 int servoWinPos = 0;										// Initial position for Servo1
 int servoGaragePos = 0;										// Initial position for Servo2
@@ -75,9 +75,14 @@ long delayEntry = 0;										// Placeholder for timer3
 long delayOLED = 0;											// Placeholder for timer4
 long currentTime;											// Current time
 
-bool locked;												// Is the door locked?
-bool AlarmOn;												// Is the system armed?
-bool NumAct;												// Is the numpad active?
+String lastDisarm = "";										// Last disarm time
+String lastArm = "";										// Last arm time
+String lastEvent = "";										// Last event time
+
+bool locked = false;										// Is the door locked?
+bool AlarmOn = false;										// Is the system armed?
+bool ArmSystem = false;										// Prepare to arm the system
+bool NumAct = false;										// Is the numpad active?
 
 // Initial functions
 void Init_Displays();
@@ -94,7 +99,8 @@ String GetTime();											// Gets time from RTC and parses it as HH:MM:SS
 String GetDate();											// Gets date from RTC and parses it as DD/MM/YYYY
 String GetTimestamp();										// Returns a string with YY/MM/DD HH:MM:SS
 void PrintOLED(int x, int y, String text, int textSize = 1);// Prints text on the OLED at pixel placement (!!)
-void SerialLog(String logEvent, String device);				// Writes important events through the serial port (115200 baud)
+void SerialLog(String logEvent, String device,
+						bool error = false);				// Writes important events through the serial port (115200 baud)
 bool Hysterese(float val, float high, float low = 0);		// Returns true if value is good
 
 // Loop functions
@@ -110,7 +116,8 @@ bool Sensor_Magnet();										// Checks all entry points
 String Sensor_DHT();										// Checks temperature and humidity
 void Sensor_MQ2();											// Checks for air quality
 String Sensor_Card();										// Checks for valid RFID card
-void EnterPassword();										// Enables possibility to enter password
-void CheckPassword();										// Checks the entered password
+void EnterPassword(char key);								// Enables possibility to enter password
+bool CheckPassword();										// Checks the entered password
+void Unlock();												// Disables alarm, unlocks etc.
 
 #endif /* COMMON_H_ */
