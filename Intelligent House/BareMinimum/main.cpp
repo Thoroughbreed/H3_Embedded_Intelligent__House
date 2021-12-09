@@ -51,7 +51,6 @@ bool AlarmOn = true;										// Is the system armed? (Starts with alarm ON)
 bool PerimOn = false;										// Perimeter system armed?)
 bool ArmSystem = false;										// Prepare to arm the system
 bool ArmPerim = false;										// Only activates perimeter system
-//bool NumAct = false;										// Is the numpad active?
 bool ShowLog = false;										// Swaps to show log on OLED
 
 
@@ -338,8 +337,8 @@ bool Entry(int interval)
 				SerialLog("DENIED", "Front door card reader");
 			}
 		}
+		return false;
 	}
-	return false;
 }
 
 String Sensor_Card()
