@@ -298,6 +298,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="alarm\alarm.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="alarm\alarm.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="common.h">
       <SubType>compile</SubType>
     </Compile>
@@ -681,6 +687,7 @@
     <Folder Include="include\libraries\Wire\" />
     <Folder Include="include\libraries\Wire\src\" />
     <Folder Include="include\libraries\Wire\src\utility\" />
+    <Folder Include="alarm" />
     <Folder Include="src\" />
     <Folder Include="src\libraries\" />
     <Folder Include="src\libraries\Adafruit_BusIO\" />

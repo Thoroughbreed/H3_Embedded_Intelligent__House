@@ -19,16 +19,13 @@
 #include <MFRC522.h>			// RFID reader
 #include <DS3231.h>				// RTC
 #include <DHT.h>				// Temp/hum sensor
-#include "lcd_icon.h"			// Custom LCD icons
-// #include <Adafruit_GFX.h>	  // DEPRECATED
+//#include "lcd_icon.h"			// Custom LCD icons
+#include "alarm/alarm.h"		// Alarm functions
 
 // Misc defines
-#define LED_ALARM 2
 #define LED_RED 3
 #define LED_GREEN 4
 #define LED_BLUE 5
-#define LED_POLICE 6
-#define REED_SWITCH 10
 #define SERVO_WINDOW 11
 #define SERVO_GARAGE 12
 #define WINDOW 0
@@ -39,8 +36,6 @@
 #define OLED_RESET 4
 // MQ-2 (Air quality)
 #define AIR A0
-// PIR (Motion sensor)
-#define PIR 8
 // RFID
 #define RST_PIN 13
 #define SS_PIN 53
@@ -71,15 +66,12 @@ void SerialLog(String logEvent, String device,
 bool Hysterese(float val, float high, float low = 0);		// Returns true if value is good
 
 // Loop functions
-void Alarm(int interval);									// Controls if the alarm system is active
 void Climate(int interval);									// Monitors the in-house climate
 void Entry(int interval);									// Checks the entry point if alarm is active
 void KeyIn();												// Controls the keypad input device
 void UpdateOLED(int interval);								// Loops around and clears the OLED and updates timestamp
 
 // Nested functions
-bool Sensor_PIR();											// Checks for motion when alarm is active
-bool Sensor_Magnet();										// Checks all entry points
 String Sensor_DHT();										// Checks temperature and humidity
 void Sensor_MQ2();											// Checks for air quality
 String Sensor_Card();										// Checks for valid RFID card
