@@ -163,7 +163,8 @@ void Alarm(int interval)
 	if (!AlarmOn) return;
 	bool sensPir = false;
 	PrintLCD(0, 0, "     ARMED");
-	PrintLCD(0, 1, "                ");
+// DEBUG
+//	PrintLCD(0, 1, "                ");
 	digitalWrite(LED_ALARM, true);
 	if ((currentTime - delayAlarm) > interval)
 	{
@@ -239,12 +240,12 @@ String Sensor_DHT()
 	}
 	
 	// Humidity control
-	if (!Hysterese(h, 80))
+	if (!Hysterese(h, 65))
 	{
 		if (!AlarmOn && servoWinPos < 180) { servoWinPos += 18; }
 		else 
 		{
-			SerialLog(String("Humidity is over 80% (currently " + String(h) + "%)"), "Climate sensor, living room");
+			SerialLog(String("Humidity is over 65% (currently " + String(h) + "%)"), "Climate sensor, living room");
 		}
 	}
 	else	{ servoWinPos = 0; }
@@ -256,7 +257,9 @@ String Sensor_DHT()
 void Sensor_MQ2()
 {
 	int ppm = analogRead(AIR);
-	if (!Hysterese(ppm, 600))
+	// DEBUG
+	Serial.println(ppm);
+	if (!Hysterese(ppm, 400))
 	{
 		if (!AlarmOn && servoGaragePos < 90) { servoGaragePos += 23; }
 		else
@@ -296,6 +299,7 @@ void Entry(int interval)
 			else
 			{
 				PrintLCD(0, 1, "  --DENIED!--");
+				SerialLog("DENIED", "Front door card reader");
 				NumAct = false;
 			}
 		}
