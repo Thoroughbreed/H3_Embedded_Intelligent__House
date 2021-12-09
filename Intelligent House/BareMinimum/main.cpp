@@ -1,7 +1,12 @@
 ﻿#include "common.h"
-
+// Servos
+Servo sWindow;
+Servo sGarage;
+Servo servos[] = { sWindow, sGarage };
 // LCD
 LiquidCrystal lcd(49, 47, 45, 43, 41, 39);
+// Keypad incl. keypad pins
+Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 // OLED Display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 // NFC reader
@@ -11,46 +16,7 @@ MFRC522::MIFARE_Key mfKey;
 RTClib myClock;
 // DHT
 DHT dht(DHT_PIN, DHTTYPE);
-// KEYPAD
-byte rowPins[ROWS] = {37, 36, 35, 34};						// Pin numbering for rows in keypad
-byte colPins[COLS] = {33, 32, 31, 30};						// Pin numbering for columns in keypad
-char keys[COLS][ROWS] = {
-	{'1', '2', '3', 'A'},
-	{'4', '5', '6', 'B'},
-	{'7', '8', '9', 'C'},
-	{'*', '0', '#', 'D'}
-};															// Keypad layout
-Keypad keypad = Keypad(makeKeymap(keys), rowPins,
-colPins, ROWS, COLS);		// Create keypad
-String approvedCards[] = {"76bf341f", "04774d824d5380"};	// Approved UUID from RFID cards
-const char pwd[4] = {'1', '3', '3', '7'};					// The "correct" password for the keypad
-char pwdTest[4];											// Empty array for testing the PW
-int pwdCount = 0;											// Counting number of chars in the PW test
 
-// Servos
-Servo sWindow;
-Servo sGarage;
-Servo servos[] = { sWindow, sGarage };
-int servoWinPos = 0;										// Initial position for Servo1
-int servoGaragePos = 0;										// Initial position for Servo2
-
-long delayAlarm = 0;										// Placeholder for timer1
-long delayClimate = 0;										// Placeholder for timer2
-long delayEntry = 0;										// Placeholder for timer3
-long delayOLED = 0;											// Placeholder for timer4
-long delayLog = 0;											// Placeholder for timer5
-
-String lastDisarm = "";										// Last disarm time
-String lastArm = "";										// Last arm time
-String lastEvent = "";										// Last event time
-String climatePrint = "";									// Shows climate on OLED
-
-bool AlarmOn = true;										// Is the system armed? (Starts with alarm ON)
-bool PerimOn = false;										// Perimeter system armed?)
-bool ArmSystem = false;										// Prepare to arm the system
-bool ArmPerim = false;										// Only activates perimeter system
-bool ShowLog = false;										// Swaps to show log on OLED
-bool NumAct = false;
 
 #pragma region Initial setup
 void Init_Displays()
@@ -176,7 +142,7 @@ void WriteLCD(int place, int line, byte icon)
 }
 
 void PrintOLED(int x, int y, String text, int textSize)
-{
+{	
 	display.setTextSize(textSize);
 	display.setTextColor(WHITE);
 	display.setCursor(x, y);
@@ -196,8 +162,6 @@ void Alarm(int interval)
 	if (!AlarmOn) return;
 	bool sensPir = false;
 	PrintLCD(0, 0, "     ARMED");
-	// DEBUG
-	//	PrintLCD(0, 1, "                ");
 	digitalWrite(LED_ALARM, true);
 	if ((millis() - delayAlarm) > interval)
 	{
@@ -276,13 +240,13 @@ String Sensor_DHT()
 	if (!Hysterese(h, 65))
 	{
 		if (!AlarmOn && servoWinPos < 180) { servoWinPos += 18; }
-		else
+		else 
 		{
 			SerialLog(String("Humidity is over 65% (currently " + String(h) + "%)"), "Climate sensor, living room");
 		}
 	}
 	else	{ servoWinPos = 0; }
-	
+		
 	RunServo(WINDOW, servoWinPos);
 	return String(String(t) + "C" + " " + String(h) + "%rH");
 }
@@ -301,7 +265,7 @@ void Sensor_MQ2()
 		}
 	}
 	else	{ servoGaragePos = 0; }
-	
+		
 	RunServo(GARAGE, servoGaragePos);
 }
 #pragma endregion
@@ -309,9 +273,9 @@ void Sensor_MQ2()
 #pragma region Entry and keypad
 void Entry(int interval)
 {
-	String cardUid = Sensor_Card();
 	if ((millis() - delayEntry) > interval)
 	{
+		String cardUid = Sensor_Card();
 		delayEntry = millis();
 		PrintLCD(0, 1, "                ");
 		ArmSystem = false;
@@ -320,13 +284,14 @@ void Entry(int interval)
 		if (!AlarmOn) return;
 		
 		SerialLog(cardUid, "Front door card reader");
-		for (int i = 0; i < 2; i++)
+		for (i = 0; i < 2; i++)
 		{
 			if (approvedCards[i] == cardUid)
 			{
+				NumAct = true;
 				PrintLCD(0, 1, "Enter code:");
 				SerialLog("APPROVED", "Front door card reader");
-				NumAct = true;
+				return;
 			}
 			else
 			{
@@ -351,6 +316,7 @@ String Sensor_Card()
 	{
 		result = result + String(mfrc522.uid.uidByte[i], HEX);
 	}
+	Serial.println(result);
 	return result;
 }
 
@@ -370,7 +336,7 @@ void KeyIn()
 				ArmPerim = true;
 			break;
 			case 'C':
-				ShowLog	= true;
+				ShowLog = true;
 			break;
 			case 'D':
 				// Delete
@@ -405,14 +371,12 @@ void KeyIn()
 				}
 			break;
 			default:
-				if (NumAct)
-				{
-					EnterPassword(key);
-				}
-				else
+				if (!NumAct)
 				{
 					pwdCount = 0;
+					break;
 				}
+				EnterPassword(key);
 			break;
 		}
 	}
@@ -425,6 +389,7 @@ void Unlock()
 	PrintLCD(0, 0, "Welcome");
 	WriteLCD(8, 0, 0);
 	AlarmOn = false;
+	locked = false;
 	digitalWrite(LED_ALARM, false);
 	digitalWrite(LED_POLICE, false);
 	SerialLog("System disarmed", "Front door keypad");
@@ -439,7 +404,7 @@ bool CheckPassword()
 		pwdTest[0] = 0;
 		return true;
 	}
-	return false;
+	return false;	
 }
 
 void EnterPassword(char key)
@@ -448,7 +413,7 @@ void EnterPassword(char key)
 	{
 		pwdTest[pwdCount] = key;
 		PrintLCD(12, 1, "    ");
-		for (int i = 0; i <= pwdCount; i++)
+		for (i = 0; i <= pwdCount; i++)
 		{
 			PrintLCD(i + 12, 1, "*");
 		}
