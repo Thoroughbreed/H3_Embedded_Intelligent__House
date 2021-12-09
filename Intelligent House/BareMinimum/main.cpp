@@ -34,6 +34,8 @@ void Init_Servo()
 {
 	sWindow.attach(SERVO_WINDOW);
 	sGarage.attach(SERVO_GARAGE);
+	RunServo(WINDOW, 0);
+	RunServo(GARAGE, 0);
 }
 
 void Init_Sensors()
@@ -153,7 +155,6 @@ bool Hysterese(float val, float high, float low /* = 0 */)
 	if (val < high && val > low)	{ return true;  }
 	else							{ return false; }
 }
-
 #pragma endregion
 
 #pragma region Alarm
@@ -203,7 +204,6 @@ bool Sensor_Magnet()
 #pragma endregion
 
 #pragma region Climate
-
 void Climate(int interval)
 {
 	if ((currentTime - delayClimate) > interval)
@@ -268,11 +268,9 @@ void Sensor_MQ2()
 		
 	RunServo(GARAGE, servoGaragePos);
 }
-
 #pragma endregion
 
 #pragma region Entry and keypad
-
 void Entry(int interval)
 {
 	String cardUid = Sensor_Card();
@@ -401,7 +399,7 @@ bool CheckPassword()
 	// Logic testing of the password
 	if (pwdTest[0] == pwd[0] && pwdTest[1] == pwd[1] && pwdTest[2] == pwd[2] && pwdTest[3] == pwd[3])
 	{
-		pwdTest[3] = 0;
+		pwdTest[0] = 0;
 		return true;
 	}
 	return false;	
@@ -425,11 +423,9 @@ void EnterPassword(char key)
 		PrintLCD(12, 1, "    ");
 	}
 }
-
 #pragma endregion
 
 #pragma region OLED
-
 void UpdateOLED(int interval)
 {
 	if ((currentTime - delayOLED) > interval)
@@ -465,9 +461,4 @@ void UpdateOLED(int interval)
 		ShowLog = false;
 	}
 }
-
 #pragma endregion
-
-
-
-
