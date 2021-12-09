@@ -7,15 +7,18 @@
 
 #include "shared.h"
 #include "../common.h"
+#include "../lcd_icon.h"
 
 extern String lastEvent;
 extern RTClib myClock;
 extern bool AlarmOn;
-extern Servo servos[];
 extern LiquidCrystal lcd;
 extern Adafruit_SSD1306 display;
 extern String climatePrint;
-
+extern Servo sWindow;
+extern Servo sGarage;
+extern Servo servos[];
+	
 int servoWinPos = 0;										// Initial position for Servo1
 int servoGaragePos = 0;										// Initial position for Servo2
 long delayOLED = 0;											// Placeholder for timer4
@@ -25,7 +28,26 @@ String lastArm = "";
 String lastEvent = "";
 bool ShowLog = false;										// Swaps to show log on OLED
 
+#pragma region Initial setup
+void Init_Displays()
+{
+	lcd.createChar(7, custBackslash);
+	lcd.createChar(6, custC);
+	lcd.createChar(0, custSmile);
+	lcd.createChar(1, custSad);
+	lcd.begin(16, 2);
+	// OLED
+	display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+}
 
+void Init_Servo()
+{
+	sWindow.attach(SERVO_WINDOW);
+	sGarage.attach(SERVO_GARAGE);
+	RunServo(WINDOW, 36);
+	RunServo(GARAGE, 36);
+}
+#pragma endregion
 
 #pragma region OnDemand functions
 void SerialLog(String logEvent, String device, bool error /* = false */)
@@ -78,6 +100,9 @@ String GetTimestamp()
 void RunServo(int servo, int angle)
 {
 	servos[servo].write(angle);
+	// DEBUG
+	Serial.println(String(servos[servo].read()));
+	Serial.println(String(servo) + " - " + String(angle));
 }
 
 void PrintLCD(int place, int line, String text)

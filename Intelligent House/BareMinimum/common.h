@@ -14,7 +14,7 @@
 #include <SPI.h>				// SPI comms
 #include <Wire.h>				// I2C comms
 #include <MFRC522.h>			// RFID reader
-//#include "lcd_icon.h"			// Custom LCD icons
+
 #include "alarm/alarm.h"		// Alarm functions
 #include "climate/climate.h"	// Climate functions
 #include "shared/shared.h"		// Shared/on-demand functions

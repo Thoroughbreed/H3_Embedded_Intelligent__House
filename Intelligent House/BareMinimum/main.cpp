@@ -1,5 +1,4 @@
 ﻿#include "common.h"
-#include "lcd_icon.h"			// Custom LCD icons
 
 bool AlarmOn = true;										// Is the system armed? (Starts with alarm ON)
 bool PerimOn = false;										// Perimeter system armed?)
@@ -53,25 +52,6 @@ DHT dht(DHT_PIN, DHTTYPE);
 
 
 #pragma region Initial setup
-void Init_Displays()
-{
-	lcd.createChar(7, custBackslash);
-	lcd.createChar(6, custC);
-	lcd.createChar(0, custSmile);
-	lcd.createChar(1, custSad);
-	lcd.begin(16, 2);
-	// OLED
-	display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-}
-
-void Init_Servo()
-{
-	sWindow.attach(SERVO_WINDOW);
-	sGarage.attach(SERVO_GARAGE);
-	RunServo(WINDOW, 0);
-	RunServo(GARAGE, 0);
-}
-
 void Init_Sensors()
 {
 	dht.begin();
