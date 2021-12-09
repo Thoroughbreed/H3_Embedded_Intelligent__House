@@ -51,43 +51,6 @@
 #define ROWS 4												// Number of rows in keypad
 #define COLS 4
 
-// KEYPAD
-byte rowPins[ROWS] = {37, 36, 35, 34};						// Pin numbering for rows in keypad
-byte colPins[COLS] = {33, 32, 31, 30};						// Pin numbering for columns in keypad
-char keys[COLS][ROWS] = {
-	{'1', '2', '3', 'A'},
-	{'4', '5', '6', 'B'},
-	{'7', '8', '9', 'C'},
-	{'*', '0', '#', 'D'}
-};															// Keypad layout
-String approvedCards[] = {"76bf341f", "04774d824d5380"};	// Approved UUID from RFID cards
-const char pwd[4] = {'1', '3', '3', '7'};					// The "correct" password for the keypad
-char pwdTest[4];											// Empty array for testing the PW
-
-int pwdCount = 0;											// Counting number of chars in the PW test
-int i = 0;													// For i
-int servoWinPos = 0;										// Initial position for Servo1
-int servoGaragePos = 0;										// Initial position for Servo2
-
-long delayAlarm = 0;										// Placeholder for timer1
-long delayClimate = 0;										// Placeholder for timer2
-long delayEntry = 0;										// Placeholder for timer3
-long delayOLED = 0;											// Placeholder for timer4
-long delayLog = 0;											// Placeholder for timer5
-
-String lastDisarm = "";										// Last disarm time
-String lastArm = "";										// Last arm time
-String lastEvent = "";										// Last event time
-String climatePrint = "";									// Shows climate on OLED
-
-bool locked = false;										// Is the door locked?
-bool AlarmOn = true;										// Is the system armed? (Starts with alarm ON)
-bool PerimOn = false;										// Perimeter system armed?)
-bool ArmSystem = false;										// Prepare to arm the system
-bool ArmPerim = false;										// Only activates perimeter system
-bool NumAct = false;										// Is the numpad active?
-bool ShowLog = false;										// Swaps to show log on OLED
-
 // Initial functions
 void Init_Displays();
 void Init_Servo();
