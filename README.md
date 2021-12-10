@@ -47,7 +47,7 @@
 | MQ-2 | 1 | Gas/air quality sensor |
 | Servo | 2 | Controlling window and garage door |
 | REED switch | 1 | Intrusion detection, front door |
-| PIR sensor | 1 | Intrusion (motion) detection, living room |
+| HC-SR501 PIR sensor | 1 | Intrusion (motion) detection, living room |
 | RFID reader | 1 | Entry system |
 | 4x4 Keypad | 1 | Entry system |
 | 16x2 LCD | 1 | Main display (armed, disarmed etc. |
