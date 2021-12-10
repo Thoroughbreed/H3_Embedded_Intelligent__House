@@ -23,9 +23,9 @@ int servoWinPos = 0;										// Initial position for Servo1
 int servoGaragePos = 0;										// Initial position for Servo2
 long delayOLED = 0;											// Placeholder for timer4
 long delayLog = 0;											// Placeholder for timer5
-String lastDisarm = "";
-String lastArm = "";
-String lastEvent = "";
+String lastDisarm = "";										// Last disarm time (log)
+String lastArm = "";										// Last arm time (log)
+String lastEvent = "";										// Last event time (log)
 bool ShowLog = false;										// Swaps to show log on OLED
 
 #pragma region Initial setup
@@ -100,9 +100,6 @@ String GetTimestamp()
 void RunServo(int servo, int angle)
 {
 	servos[servo].write(angle);
-	// DEBUG
-	Serial.println(String(servos[servo].read()));
-	Serial.println(String(servo) + " - " + String(angle));
 }
 
 void PrintLCD(int place, int line, String text)

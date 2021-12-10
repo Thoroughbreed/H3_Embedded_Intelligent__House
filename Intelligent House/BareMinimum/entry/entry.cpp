@@ -14,13 +14,13 @@ char pwdTest[4];											// Empty array for testing the PW
 int pwdCount = 0;											// Counting number of chars in the PW test
 long delayEntry = 0;										// Placeholder for timer3
 bool NumAct = false;										// Is the numpad active?
-MFRC522::MIFARE_Key mfKey;
+MFRC522::MIFARE_Key mfKey;									// Key type (RFID reader)
 
 extern MFRC522 mfrc522;
 extern Keypad keypad;
-extern String lastDisarm;// = "";										// Last disarm time
-extern String lastArm;// = "";										// Last arm time
-extern String lastEvent;// = "";										// Last event time
+extern String lastDisarm;
+extern String lastArm;
+extern String lastEvent;
 extern bool ShowLog;
 extern bool ArmSystem;
 extern bool ArmPerim;

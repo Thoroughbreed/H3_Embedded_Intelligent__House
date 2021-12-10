@@ -69,7 +69,6 @@ String Sensor_DHT()
 void Sensor_MQ2()
 {
 	int ppm = analogRead(AIR);
-	SerialLog(String(ppm), "MQ-2");
 	if (!Hysterese(ppm, 400))
 	{
 		if (!AlarmOn && servoGaragePos < 90) { servoGaragePos += 23; }
