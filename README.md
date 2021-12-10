@@ -153,3 +153,7 @@ Jan Andreasen - [@andreasen_jan](https://twitter.com/andreasen_jan) - jan@tved.i
 Project Link: [https://github.com/jaa2019/H3_Embedded_Intelligent__House](https://github.com/jaa2019/H3_Embedded_Intelligent__House)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+<sup>1</sup> - Writes via USART to computer.
+<sup>2</sup> - Function not built in yet, no test device available
+<sup>3</sup> - Look at [https://github.com/jaa2019/SerialLogger](https://github.com/jaa2019/SerialLogger) for the serial logging application
