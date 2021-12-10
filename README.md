@@ -14,7 +14,7 @@
     <li>
       <a href="#case">Case</a>
       <ul>
-        <li><a href="#summary&sol;rundown">Summary&sol;rundown</a></li>
+        <li><a href="#summary-and-rundown">Summary/rundown</a></li>
         <li><a href="#getting-started">Getting started</a></li>
       </ul>
     </li>
@@ -81,7 +81,7 @@ Build a master unit for the *Intelligent house* - the unit must be the "heart" o
 * User-friendly interaction
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-##  Summary/rundown
+##  Summary and rundown
 The **IntelliHouse2000** is a all-in-one microcontroller that provides climate control, monitoring and alarm/entry functions for the entire house. You can have sensors in all rooms, and set the parameters for each sensor. 
 If an event is triggered while the alarm is armed, no apparent function will happen in the house, but the log will be updated and the user will get a message<sup>1</sup> with the event, timestamp and what sensor triggered it. If however the alarm is disarmed (that is, the user is home) **IntelliHouse2000** will take action on the event.
 > If you forget to turn off your car in the garage, and the sensor detects rising CO<sub>2</sub> levels, the user will be warned, displays around the house will show the event, and the garage door will open incrementally until the sensor value returns to normal
@@ -115,19 +115,19 @@ Make sure to read the setup for each device, some communicate by one-wire (like 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Full chart
-![Full chart](https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/Full_diagram.drawio.svg?raw=true)
+![Full chart](https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/full_diagram.png?raw=true)
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Alarm
-![HIPO Diagram](https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/Alarm.png?raw=true)
+![Alarm](https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/Alarm.png?raw=true)
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Climate
-![HIPO Diagram](https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/Climate.png?raw=true)
+![Climate](https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/Climate.png?raw=true)
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Entry
-![HIPO Diagram](https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/Entry.png?raw=true)
+![Entry](https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/Entry.png?raw=true)
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## License
