@@ -135,7 +135,7 @@ Make sure to read the setup for each device, some communicate by one-wire (like 
 - [x] Integrate access control (RFID/NFC)
 - [x] Make it easily expandable
 - [x] Integrate several different devices
-- [ ] Create a log application to read from serial input
+- [x] Create a log application to read from serial input<sup>3</sup>
 - [ ] Move application to IOT enabled board (Uno Wifi etc.) 
 - [ ] Create web-api/frontend for control system
 
