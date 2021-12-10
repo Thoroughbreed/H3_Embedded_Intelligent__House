@@ -130,6 +130,15 @@ Make sure to read the setup for each device, some communicate by one-wire (like 
 ![Entry](https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/Entry.png?raw=true)
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+## Roadmap
+- [x] Make a fully functional alarm/control system
+- [x] Integrate access control (RFID/NFC)
+- [x] Make it easily expandable
+- [x] Integrate several different devices
+- [ ] Create a log application to read from serial input
+- [ ] Move application to IOT enabled board (Uno Wifi etc.) 
+- [ ] Create web-api/frontend for control system
+
 ## License
 * Hardware: CC-BY-LA (Creative Commons)
 * Software: LGPL, GPLv2
