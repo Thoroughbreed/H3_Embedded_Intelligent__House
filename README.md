@@ -1,3 +1,9 @@
+![Build succeeded][build-shield]
+![Test passing][test-shield]
+[![Issues][issues-shield]][issues-url]
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+
 # Intelligent house
 #### H3 Embedded II final project
 <!-- TABLE OF CONTENTS -->
@@ -141,7 +147,7 @@ Make sure to read the setup for each device, some communicate by one-wire (like 
 
 ## License
 * Hardware: CC-BY-LA (Creative Commons)
-* Software: LGPL, GPLv2
+* Software: GPLv3
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -159,3 +165,14 @@ Project Link: [https://github.com/jaa2019/H3_Embedded_Intelligent__House](https:
 <sup>2</sup> - Function not built in yet, no test device available
 
 <sup>3</sup> - Look at [https://github.com/jaa2019/SerialLogger](https://github.com/jaa2019/SerialLogger) for the serial logging application
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[build-shield]: https://img.shields.io/badge/Build-succeeded-brightgreen.svg
+[test-shield]: https://img.shields.io/badge/Tests-passing-brightgreen.svg
+[contributors-shield]: https://img.shields.io/badge/Contributors-2-brightgreen.svg
+[contributors-url]: https://github.com/jaa2019/H3_Embedded_Intelligent__House/graphs/contributors
+[forks-shield]: https://img.shields.io/badge/Forks-0-blue.svg
+[forks-url]: https://github.com/jaa2019/H3_Embedded_Intelligent__House/network/members
+[issues-shield]: https://img.shields.io/badge/Issues-0-brightgreen.svg
+[issues-url]: https://github.com/jaa2019/H3_Embedded_Intelligent__House/issues
