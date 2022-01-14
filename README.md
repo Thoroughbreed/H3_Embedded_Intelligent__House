@@ -3,6 +3,7 @@
 [![Issues][issues-shield]][issues-url]
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
+[![License][license-shield]][license-url]
 
 # Intelligent house
 #### H3 Embedded II final project
@@ -154,7 +155,9 @@ Make sure to read the setup for each device, some communicate by one-wire (like 
 
 ## Contact
 
-Jan Andreasen - [@andreasen_jan](https://twitter.com/andreasen_jan) - jan@tved.it
+Jan Andreasen - jan@tved.it
+
+[![Twitter][twitter-shield]][twitter-url]
 
 Project Link: [https://github.com/jaa2019/H3_Embedded_Intelligent__House](https://github.com/jaa2019/H3_Embedded_Intelligent__House)
 
@@ -170,9 +173,13 @@ Project Link: [https://github.com/jaa2019/H3_Embedded_Intelligent__House](https:
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [build-shield]: https://img.shields.io/badge/Build-succeeded-brightgreen.svg
 [test-shield]: https://img.shields.io/badge/Tests-passing-brightgreen.svg
-[contributors-shield]: https://img.shields.io/badge/Contributors-1-brightgreen.svg
+[contributors-shield]: https://img.shields.io/github/contributors/jaa2019/H3_Embedded_Intelligent__House.svg?style=badge
 [contributors-url]: https://github.com/jaa2019/H3_Embedded_Intelligent__House/graphs/contributors
-[forks-shield]: https://img.shields.io/badge/Forks-0-blue.svg
+[forks-shield]: https://img.shields.io/github/forks/jaa2019/H3_Embedded_Intelligent__House.svg?style=badge
 [forks-url]: https://github.com/jaa2019/H3_Embedded_Intelligent__House/network/members
-[issues-shield]: https://img.shields.io/badge/Issues-0-brightgreen.svg
+[issues-shield]: https://img.shields.io/github/issues/jaa2019/H3_Embedded_Intelligent__House.svg?style=badge
 [issues-url]: https://github.com/jaa2019/H3_Embedded_Intelligent__House/issues
+[license-shield]: https://img.shields.io/github/license/jaa2019/H3_Embedded_Intelligent__House.svg?style=badge
+[license-url]: https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/LICENSE.txt
+[twitter-shield]: https://img.shields.io/twitter/follow/andreasen_jan?style=social
+[twitter-url]: https://twitter.com/andreasen_jan
