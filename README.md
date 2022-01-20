@@ -180,6 +180,6 @@ Project Link: [https://github.com/jaa2019/H3_Embedded_Intelligent__House](https:
 [issues-shield]: https://img.shields.io/github/issues/jaa2019/H3_Embedded_Intelligent__House.svg?style=badge
 [issues-url]: https://github.com/jaa2019/H3_Embedded_Intelligent__House/issues
 [license-shield]: https://img.shields.io/github/license/jaa2019/H3_Embedded_Intelligent__House.svg?style=badge
-[license-url]: https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/LICENSE.txt
+[license-url]: https://github.com/jaa2019/H3_Embedded_Intelligent__House/blob/master/LICENSE
 [twitter-shield]: https://img.shields.io/twitter/follow/andreasen_jan?style=social
 [twitter-url]: https://twitter.com/andreasen_jan
